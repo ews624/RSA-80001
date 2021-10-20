@@ -32,6 +32,16 @@ int main (){
 		printf("Error, could not open file\n");
 	}
 	
+	gmp_randstate_t state;
+	gmp_randinit_default(state);
+	
+	mp_bitcnt_t n;
+	n = 1024;
+	
+	mpz_t rand;
+	mpz_urandomb(rand,state,n);
+	mpz_out_str(stdout,10,rand);
+	
 	
 	return 1;
 }
