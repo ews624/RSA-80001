@@ -12,10 +12,11 @@ void get_random(mpz_t random){
 	mpz_t seed;
 	mpz_init(seed);
 	
-	srand(time(NULL));
+	
+
 	int r =rand();
 	
-	printf("R is :%d",r);
+	printf("R is :%d\n",r);
 	mpz_set_ui(seed,r);
 	gmp_randseed(state,seed);
 	
@@ -57,6 +58,8 @@ int main (){
 	
 	mpz_t k_large;
 	
+	srand(time(NULL));
+	
 	char k[1024];
 	printf("Enter the value for k\n");
 	scanf("%1023s",&k);
@@ -87,12 +90,23 @@ int main (){
 	*/
 	
 	
-	mpz_t random1;
+	mpz_t p;
+	mpz_t q;
+	mpz_t N;
+	
 
-	mpz_init(random1);
-
-	get_random(random1);
-	mpz_out_str(stdout,10,random1);
+	mpz_init(p);
+	mpz_init(q);
+	mpz_init(N);
+	
+	get_random(p);
+	get_random(q);
+	mpz_mul(N,p,q);
+	
+	
+	
+	
+	
 	return 1;
 }
 
