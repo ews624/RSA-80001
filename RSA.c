@@ -21,7 +21,7 @@ void get_random(mpz_t random){
 	gmp_randseed(state,seed);
 	
 	mp_bitcnt_t n;
-	n = 1024;
+	n = 2048;
 	
 	
 	mpz_urandomb(random,state,n);
@@ -93,19 +93,40 @@ int main (){
 	mpz_t p;
 	mpz_t q;
 	mpz_t N;
-	
+	mpz_t phi_n;
+	mpz_t e;
+	mpz_t d;
+	mpz_t test;
 
 	mpz_init(p);
 	mpz_init(q);
 	mpz_init(N);
+	mpz_init(phi_n);
+	mpz_init(e);
+	mpz_init(d);
+	mpz_init(test);
 	
 	get_random(p);
 	get_random(q);
 	mpz_mul(N,p,q);
+	mpz_mul(phi_n,(p-1),(q-1));
+	mpz_set_ui(e,65537);
+	mpz_invert(d,e,phi_n);
 	
+	mpz_mul(test,e,d);
+	mpz_mod(test,test,phi_n);
 	
+	printf("Mod ed is :\n");
+	mpz_out_str(stdout,10,test);
+	printf("\n");
 	
+	printf("N is :\n");
+	mpz_out_str(stdout,10,N);
+	printf("\n");
 	
+	printf("Phi N is :\n");
+	mpz_out_str(stdout,10,phi_n);
+	printf("\n");
 	
 	return 1;
 }
