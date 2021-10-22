@@ -4,6 +4,32 @@
 #include<time.h>
 #include<stdlib.h>
 
+
+size_t save(FILE *ptr,mpz_t var){
+	
+	size_t check;
+	
+	mpz_t newline;
+	
+	mpz_init(newline);
+	
+	mpz_set_str(newline,"\n",62);
+	
+	//fprintf(ptr,"\n");
+	check =mpz_out_str(ptr,10,var);
+	fprintf(ptr,"\n");
+	
+	
+	if(check == 0){
+		printf("Error saving file");
+		return 0;	
+	}
+	
+	return check;
+
+};
+
+
 void get_random(mpz_t random){
 	
 	gmp_randstate_t state;
@@ -19,7 +45,7 @@ void get_random(mpz_t random){
 	gmp_randseed(state,seed);
 	
 	mp_bitcnt_t n;
-	n = 8;
+	n = 2048;
 	
 	
 	mpz_urandomb(random,state,n);
@@ -138,12 +164,8 @@ int main (){
 	
 	
 	
-	mpz_set_ui(e,17);
+	mpz_set_ui(e,65537);
 	
-	
-
-	
-	mpz_set_ui(d,j);
 	
 	mpz_invert(d,e,phi_n);
 	
@@ -175,6 +197,43 @@ int main (){
 	printf("Decrypted Y/X is :\n");
 	mpz_out_str(stdout,10,y);
 	printf("\n");
+	
+	FILE *input_file = fopen("encrypt.txt","a+");
+	if(input_file == NULL){
+		printf("Error with fopen\n");
+	}
+	size_t check;
+	
+	check =save(input_file,e); //mpz_out_str(input_file,10,e);
+	check =save(input_file,p);
+	check =save(input_file,q);
+	fclose(input_file);
+	
+	input_file = fopen("private.txt","a+");
+	check =save(input_file,N);
+	check =save(input_file,d);
+	fclose(input_file);
+	
+	input_file = fopen("X.txt","a+");
+	check =save(input_file,k_large);
+	fclose(input_file);
+	
+	
+	input_file = fopen("encryptX.txt","a+");
+	check =save(input_file,x);
+	fclose(input_file);
+	
+	input_file = fopen("cipher.txt","a+");
+	check =save(input_file,x);
+	fclose(input_file);
+	
+	input_file = fopen("decrypted.txt","a+");
+	check =save(input_file,y);
+	fclose(input_file);
+	
+	
+	
+	
 	
 	
 	
