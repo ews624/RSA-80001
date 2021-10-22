@@ -13,7 +13,7 @@ size_t save(FILE *ptr,mpz_t var){
 	
 	mpz_init(newline);
 	
-	mpz_set_str(newline,"\n",62);
+	//mpz_set_str(newline,"\n",62);
 	
 	//fprintf(ptr,"\n");
 	check =mpz_out_str(ptr,10,var);
@@ -67,9 +67,20 @@ void get_random(mpz_t random){
 	//printf("\n Is Prime\n");
 
 };
+/*
+long concat(char k[]){
+
+	long l = 0x00;
+	
+	long combined;
+	
+	combined = l << 8|(long)k;
+	printf("combined is:%ld",combined);
+	return combined;
 
 
-
+};
+*/
 int main (){
 	
 	
@@ -81,6 +92,8 @@ int main (){
 	printf("Enter the value for k\n");
 	scanf("%1023s",&k);
 	
+	
+	//long cat = concat(k);
 	
 	mpz_init(k_large);
 	mpz_set_ui(k_large,0);
