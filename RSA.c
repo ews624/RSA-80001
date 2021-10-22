@@ -56,7 +56,6 @@ int main (){
 	scanf("%1023s",&k);
 	
 	
-	
 	mpz_init(k_large);
 	mpz_set_ui(k_large,0);
 	
