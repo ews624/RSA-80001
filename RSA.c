@@ -3,7 +3,7 @@
 #include<assert.h>
 #include<time.h>
 #include<stdlib.h>
-
+#include<string.h>
 
 size_t save(FILE *ptr,mpz_t var){
 	
@@ -67,49 +67,78 @@ void get_random(mpz_t random){
 	//printf("\n Is Prime\n");
 
 };
-/*
-long concat(char k[]){
 
-	long l = 0x00;
+char *concat(char *k){
+
+	char l[2048] = "0";
+	printf("Char size is:%ld",sizeof(char));
+	//char *ran;
+	int num = rand();
+	num = (num %10)+48;
+	//ran = num;
+	char a[2048];// = num;
+	a[0] = num;
+	//strcpy(a,ran);// = (char)ran;
+	char b[2048] = "2";
+	char c[2048] = "0";
 	
-	long combined;
+	//l = 0x00;
+	printf("Dereferenced k:%s\n",k);
 	
-	combined = l << 8|(long)k;
-	printf("combined is:%ld",combined);
-	return combined;
+	
+	strcat(l,k);
+	
+	printf("combined is:%s\n",l);
+	
+	strcat(a,l);
+	strcat(b,a);
+	strcat(c,b);
+	printf("Fully combined is:%s\n",c);
+	
+	char *ptr;
+	ptr = c;
+	
+	return ptr;
 
 
 };
-*/
+
 int main (){
 	
 	
 	mpz_t k_large;
+	mpz_t cat_large;
+	
+	mpz_init(k_large);
+	mpz_init(cat_large);
 	
 	srand(time(NULL));
 	
-	char k[1024];
+	
+	char *k =(char*)malloc(1024*sizeof(char));
 	printf("Enter the value for k\n");
-	scanf("%1023s",&k);
+	scanf("%1023s",k);
 	
 	
-	//long cat = concat(k);
+	char *cat=(char*)malloc(1024*sizeof(char));
 	
-	mpz_init(k_large);
+	cat = concat(k);
+	printf("PKCS padding is:%s\n",cat);
+	
+	
+	
 	mpz_set_ui(k_large,0);
+	mpz_set_ui(cat_large,0);
+	
 	
 	mpz_set_str(k_large,k,10);
+	mpz_set_str(cat_large,cat,10);
+	
 	
 	printf("GMP print of k=");
 	mpz_out_str(stdout,10,k_large);
 	printf("\n");
 	
-	/*
-	FILE *input_file = fopen("encrypt.txt","r");
-	if(input_file == NULL){
-		printf("Error, could not open file\n");
-	}
-	*/
 	
 	
 	mpz_t p;
@@ -162,7 +191,7 @@ int main (){
 	mpz_sub_ui(q_minus,q,1);
 	
 	printf("Q-1 is :\n");
-	mpz_out_str(stdout,10,q);
+	mpz_out_str(stdout,10,q_minus);
 	printf("\n");
 	
 	mpz_mul(phi_n,p_minus,q_minus);
@@ -211,6 +240,37 @@ int main (){
 	mpz_out_str(stdout,10,y);
 	printf("\n");
 	
+	
+	
+	
+	//PKCS encrypt
+	mpz_t pkcs_x;
+	mpz_init(pkcs_x);
+	
+	
+	printf("GMP print of PKCS=");
+	mpz_out_str(stdout,10,cat_large);
+	printf("\n");
+	
+	mpz_powm(pkcs_x,cat_large,e,N);
+	
+	printf("Encrypted PKCS X/Y is :\n");
+	mpz_out_str(stdout,10,pkcs_x);
+	printf("\n");
+	
+	//PKCS decrypt
+	mpz_t pkcs_y;
+	mpz_init(pkcs_y);
+	
+	mpz_powm(pkcs_y,pkcs_x,d,N);
+	
+	printf("Decrypted PKCS Y/X is :\n");
+	mpz_out_str(stdout,10,pkcs_y);
+	printf("\n");
+	
+	
+	
+	
 	FILE *input_file = fopen("encrypt.txt","a+");
 	if(input_file == NULL){
 		printf("Error with fopen\n");
@@ -220,6 +280,9 @@ int main (){
 	check =save(input_file,e); //mpz_out_str(input_file,10,e);
 	check =save(input_file,p);
 	check =save(input_file,q);
+	if(check ==0){
+		return -1;
+	}
 	fclose(input_file);
 	
 	input_file = fopen("private.txt","a+");
