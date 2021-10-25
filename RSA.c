@@ -10,12 +10,9 @@ size_t save(FILE *ptr,mpz_t var){
 	size_t check;
 	
 	mpz_t newline;
-	
 	mpz_init(newline);
 	
-	//mpz_set_str(newline,"\n",62);
-	
-	//fprintf(ptr,"\n");
+
 	check =mpz_out_str(ptr,10,var);
 	fprintf(ptr,"\n");
 	
@@ -29,6 +26,15 @@ size_t save(FILE *ptr,mpz_t var){
 
 };
 
+void file_save(char *filename, mpz_t var){
+	FILE *input_file = fopen(filename,"a+");
+	if(input_file == NULL){
+		printf("Error with fopen\n");
+		return;
+	}
+	save(input_file,var);
+	fclose(input_file);
+};
 
 void get_random(mpz_t random){
 	
@@ -57,32 +63,26 @@ void get_random(mpz_t random){
 	
 	while(is_prime == 0){
 		mpz_nextprime(random,random);
-		/*mpz_set_ui(seed,r);
-		gmp_randseed(state,seed);
-		mpz_urandomb(random,state,n);
-		*/
+		
 		is_prime = mpz_probab_prime_p(random,40);
 	}
-	//mpz_out_str(stdout,10,random);
-	//printf("\n Is Prime\n");
+	
 
 };
 
 char *concat(char *k){
 
 	char l[2048] = "0";
-	printf("Char size is:%ld",sizeof(char));
-	//char *ran;
+	
 	int num = rand();
 	num = (num %10)+48;
-	//ran = num;
-	char a[2048];// = num;
+	
+	char a[2048];
 	a[0] = num;
-	//strcpy(a,ran);// = (char)ran;
+	
 	char b[2048] = "2";
 	char c[2048] = "0";
 	
-	//l = 0x00;
 	printf("Dereferenced k:%s\n",k);
 	
 	
@@ -186,8 +186,7 @@ int main (){
 	
 	mpz_sub_ui(p_minus,p,1);
 	
-	
-	//mpz_sub_ui(p,p,1);
+
 	mpz_sub_ui(q_minus,q,1);
 	
 	printf("Q-1 is :\n");
@@ -270,46 +269,60 @@ int main (){
 	
 	
 	
+	int filesave;
 	
-	FILE *input_file = fopen("encrypt.txt","a+");
-	if(input_file == NULL){
-		printf("Error with fopen\n");
+	printf("Do you want to manually enter the output filenames? 1=Yes, 2=No\n");
+	scanf("%d",&filesave);
+	
+	if(filesave ==1){
+		char file_name[64];
+		printf("What do you want to name the file for e,p,q?\n");
+		scanf("%s",file_name);
+		file_save(file_name,e);
+		file_save(file_name,p);
+		file_save(file_name,q);
+		
+		printf("What do you want to name the file for d and N?\n");
+		scanf("%s",file_name);
+		file_save(file_name,N);
+		file_save(file_name,d);
+		
+		printf("What do you want to name the file for x to be encrypted?\n");
+		scanf("%s",file_name);
+		file_save(file_name,k_large);
+		
+		printf("What do you want to name the file for E(x)?\n");
+		scanf("%s",file_name);
+		file_save(file_name,x);
+		
+		
+		printf("What do you want to name the file for c to be decrypted?\n");
+		scanf("%s",file_name);
+		file_save("cipher.txt",x);
+		
+		
+		printf("What do you want to name the file for D(c)?\n");
+		scanf("%s",file_name);
+		file_save("decrypted.txt",y);
+		
 	}
-	size_t check;
-	
-	check =save(input_file,e); //mpz_out_str(input_file,10,e);
-	check =save(input_file,p);
-	check =save(input_file,q);
-	if(check ==0){
-		return -1;
+	else{
+		file_save("encrypt.txt",e);
+		file_save("encrypt.txt",p);
+		file_save("encrypt.txt",q);
+
+		file_save("private.txt",N);
+		file_save("private.txt",d);
+		
+		file_save("X.txt",k_large);
+		
+		file_save("encryptX.txt",x);
+		
+		file_save("cipher.txt",x);
+		
+		file_save("decrypted.txt",y);
+		
 	}
-	fclose(input_file);
-	
-	input_file = fopen("private.txt","a+");
-	check =save(input_file,N);
-	check =save(input_file,d);
-	fclose(input_file);
-	
-	input_file = fopen("X.txt","a+");
-	check =save(input_file,k_large);
-	fclose(input_file);
-	
-	
-	input_file = fopen("encryptX.txt","a+");
-	check =save(input_file,x);
-	fclose(input_file);
-	
-	input_file = fopen("cipher.txt","a+");
-	check =save(input_file,x);
-	fclose(input_file);
-	
-	input_file = fopen("decrypted.txt","a+");
-	check =save(input_file,y);
-	fclose(input_file);
-	
-	
-	
-	
 	
 	
 	
