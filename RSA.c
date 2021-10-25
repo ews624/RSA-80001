@@ -5,6 +5,7 @@
 #include<stdlib.h>
 #include<string.h>
 
+// This function saves the contents of var into the FILE ptr
 size_t save(FILE *ptr,mpz_t var){
 	
 	size_t check;
@@ -24,7 +25,7 @@ size_t save(FILE *ptr,mpz_t var){
 	return check;
 
 };
-
+//Opens a file and then error checks 
 void file_save(char *filename, mpz_t var){
 	FILE *input_file = fopen(filename,"a+");
 	if(input_file == NULL){
@@ -34,26 +35,23 @@ void file_save(char *filename, mpz_t var){
 	save(input_file,var);
 	fclose(input_file);
 };
-
+//Generates a random prime of size k bits and checks if it actually prime
 void get_random(mpz_t random, char *k){
 	
-	gmp_randstate_t state;
-	gmp_randinit_mt(state);
-	
 	mpz_t seed;
-	mpz_init(seed);
-	
 	int r =rand();
+	mp_bitcnt_t n;
+	n = *k;
+	int is_prime;
+	gmp_randstate_t state;
+	
+	gmp_randinit_mt(state);
+	mpz_init(seed);
 	
 	mpz_set_ui(seed,r);
 	gmp_randseed(state,seed);
 	
-	mp_bitcnt_t n;
-	n = *k;
-	
 	mpz_urandomb(random,state,n);
-	
-	int is_prime;
 	
 	is_prime = mpz_probab_prime_p(random,40);
 	
@@ -63,7 +61,7 @@ void get_random(mpz_t random, char *k){
 	}
 
 };
-
+//This Function is used for the PKCS padding by concatinating the padding bytes and the values together
 char *concat(char *k){
 
 	char l[2048] = "0";
@@ -99,43 +97,35 @@ void decrypt(mpz_t y,mpz_t x, mpz_t d, mpz_t N){
 
 int main (){
 	
-	
 	char file_name[64];
-	
 	mpz_t k_large;
 	mpz_t cat_large;
 	
 	mpz_init(k_large);
 	mpz_init(cat_large);
-	
+	//Generate PSrandom functionality
 	srand(time(NULL));
 	
-	
+	//Set the value of k to a maximum of 1024 bytes
 	char *k =(char*)malloc(1024*sizeof(char));
 	printf("Enter the value for k:");
 	scanf("%1023s",k);
 	
 	
 	char *cat=(char*)malloc(1024*sizeof(char));
-	
+	//We use the k-integer for our PKCS padding scheme
 	cat = concat(k);
 	printf("PKCS padding is:%s\n",cat);
-	
-	
 	
 	mpz_set_ui(k_large,0);
 	mpz_set_ui(cat_large,0);
 	
-	
 	mpz_set_str(k_large,k,10);
 	mpz_set_str(cat_large,cat,10);
-	
-	
+	//	
 	printf("GMP print of k=");
 	mpz_out_str(stdout,10,k_large);
 	printf("\n");
-	
-	
 	
 	mpz_t p;
 	mpz_t q;
@@ -158,23 +148,27 @@ int main (){
 	mpz_init(x);
 	mpz_init(y);
 	
+	//Loads in 'x' from encrypt.txt
 	mpz_t rop;
 	mpz_init(rop);
 	FILE *test_file = fopen("encrypt.txt","a+");
 	mpz_inp_str(e,test_file,10);
 	
+	//Makes a random prime p of size k bits
 	get_random(p,k);
 	
 	printf("P is :\n");
 	mpz_out_str(stdout,10,p);
 	printf("\n");
 	
+	//Makes a random prime q of size k bits
 	get_random(q,k);
 	
 	printf("Q is :\n");
 	mpz_out_str(stdout,10,q);
 	printf("\n");
 	
+	//Makes N=pq
 	mpz_mul(N,p,q);
 	
 	mpz_t p_minus;
@@ -189,7 +183,7 @@ int main (){
 	printf("Q-1 is :\n");
 	mpz_out_str(stdout,10,q_minus);
 	printf("\n");
-	
+	//Makes phi(N) from (q-1)(p-1)
 	mpz_mul(phi_n,p_minus,q_minus);
 	
 	printf("N is :\n");
@@ -207,7 +201,7 @@ int main (){
 	mpz_out_str(stdout,10,d);
 	printf("\n");
 	
-	
+	//Test if ed = 1 mod phi(N) 
 	mpz_mul(test,e,d);
 	mpz_mod(test,test,phi_n);
 	
@@ -221,20 +215,20 @@ int main (){
 	mpz_inp_str(x,x_file,10);
 	
 	
-	//Encrypt here
+	//Encrypt x here
 	
 	encrypt(x,x,e,N);
 	
 	
-	printf("Encrypted X/Y is :\n");
+	printf("Encrypted X or Y is :\n");
 	mpz_out_str(stdout,10,x);
 	printf("\n");
 	
-	//Decrypt here
+	//Decrypt x here
 	decrypt(y,x,d,N);
 	
 	
-	printf("Decrypted Y/X is :\n");
+	printf("Decrypted Y or X is :\n");
 	mpz_out_str(stdout,10,y);
 	printf("\n");
 	
@@ -250,7 +244,7 @@ int main (){
 	
 	encrypt(pkcs_x,cat_large,e,N);
 	
-	printf("Encrypted PKCS X/Y is :\n");
+	printf("Encrypted PKCS X or PKCS Y is :\n");
 	mpz_out_str(stdout,10,pkcs_x);
 	printf("\n");
 	
@@ -260,11 +254,11 @@ int main (){
 	
 	mpz_powm(pkcs_y,pkcs_x,d,N);
 	
-	printf("Decrypted PKCS Y/X is :\n");
+	printf("Decrypted PKCS Y or PKCS X is :\n");
 	mpz_out_str(stdout,10,pkcs_y);
 	printf("\n");
 	
-
+	//Where do you want to save your values?
 	printf("What do you want to name the file for d and N?\n");
 	scanf("%s",file_name);
 	file_save(file_name,N);
