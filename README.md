@@ -3,7 +3,7 @@ RSA algorithm for CS 8001
 -------
 
 ## Compile and Execution
-The gmplib library is necessary to run my code. Instructions and source code are available at https://gmplib.org/ . 
+The gmplib library is necessary to run my code you must it install it on your machine. Instructions and source code are available at https://gmplib.org/ . 
 Using a gcc compiler on Ubuntu to compile the code I used ``` gcc -o rsa RSA.c -lgmp``` and then it can be executed with
 typing ```./rsa``` 
 The program will then ask for an integer k input. This will be used to determine how many bits are used the encryption.
