@@ -15,9 +15,9 @@ The program will then ask for an integer k input. This will be used to determine
 * X.txt
   * This contains the 'x' that will be encrypted and then decrypted with the RSA algorithm
 * dN.txt
-  * Contains d and N, the private key, which will allow for decryption of the encrypted value
+  * Contains d and N, the private key, that were used and will allow for decryption of the encrypted value
 * Encrypt.txt
-  * Contains the e, p, q, which will be used as the private key      
+  * Contains the e which will be used as the private key      
 * encryptX.txt
-  * Contains the Encrypted 'x' which was encrypted by e and can be decrypted with d
+  * Contains the Encrypted 'x' which was encrypted by e and can be decrypted with d and N
  
