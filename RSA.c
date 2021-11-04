@@ -36,14 +36,13 @@ void file_save(char *filename, mpz_t var){
 	fclose(input_file);
 };
 //Generates a random prime of size k bits and checks if it actually prime
-void get_random(mpz_t random, char *k){
+void get_random(mpz_t random, mpz_t k){
 	
 	mpz_t seed;
 	int r =rand();
-	mp_bitcnt_t n;
-	n = *k;
 	int is_prime;
 	gmp_randstate_t state;
+	mp_bitcnt_t n = mpz_get_ui(k);
 	
 	gmp_randinit_mt(state);
 	mpz_init(seed);
@@ -79,7 +78,6 @@ char *concat(char *k){
 	strcat(a,l);
 	strcat(b,a);
 	strcat(c,b);
-	printf("Fully combined is:%s\n",c);
 	
 	char *ptr;
 	ptr = c;
@@ -97,6 +95,7 @@ void decrypt(mpz_t y,mpz_t x, mpz_t d, mpz_t N){
 
 int main (){
 	
+	//Getting our input K to use for our program
 	char file_name[64];
 	mpz_t k_large;
 	mpz_t cat_large;
@@ -111,7 +110,6 @@ int main (){
 	printf("Enter the value for k:");
 	scanf("%1023s",k);
 	
-	
 	char *cat=(char*)malloc(1024*sizeof(char));
 	//We use the k-integer for our PKCS padding scheme
 	cat = concat(k);
@@ -119,14 +117,12 @@ int main (){
 	
 	mpz_set_ui(k_large,0);
 	mpz_set_ui(cat_large,0);
-	
+
 	mpz_set_str(k_large,k,10);
 	mpz_set_str(cat_large,cat,10);
-	//	
-	printf("GMP print of k=");
-	mpz_out_str(stdout,10,k_large);
-	printf("\n");
 	
+	
+	//All variables that are used in main
 	mpz_t p;
 	mpz_t q;
 	mpz_t N;
@@ -136,8 +132,11 @@ int main (){
 	mpz_t test;
 	mpz_t x;
 	mpz_t y;
-
-
+	mpz_t pkcs_x;
+	mpz_t pkcs_y;
+	mpz_t p_minus;
+	mpz_t q_minus;
+	
 	mpz_init(p);
 	mpz_init(q);
 	mpz_init(N);
@@ -147,42 +146,39 @@ int main (){
 	mpz_init(test);
 	mpz_init(x);
 	mpz_init(y);
-	
-	//Loads in 'x' from encrypt.txt
-	mpz_t rop;
-	mpz_init(rop);
+	mpz_init(pkcs_x);
+	mpz_init(pkcs_y);
+	mpz_init(p_minus);
+	mpz_init(q_minus);
+	//Loads in 'e' from encrypt.txt
 	FILE *test_file = fopen("encrypt.txt","a+");
 	mpz_inp_str(e,test_file,10);
 	
 	//Makes a random prime p of size k bits
-	get_random(p,k);
+	get_random(p,k_large);
 	
 	printf("P is :\n");
 	mpz_out_str(stdout,10,p);
 	printf("\n");
 	
 	//Makes a random prime q of size k bits
-	get_random(q,k);
+	get_random(q,k_large);
 	
 	printf("Q is :\n");
 	mpz_out_str(stdout,10,q);
 	printf("\n");
 	
-	//Makes N=pq
-	mpz_mul(N,p,q);
-	
-	mpz_t p_minus;
-	mpz_t q_minus;
-	
-	mpz_init(p_minus);
-	mpz_init(q_minus);
-	
+	//Make p-1 and q-1
 	mpz_sub_ui(p_minus,p,1);
 	mpz_sub_ui(q_minus,q,1);
 	
 	printf("Q-1 is :\n");
 	mpz_out_str(stdout,10,q_minus);
 	printf("\n");
+	
+	//Makes N=pq
+	mpz_mul(N,p,q);
+	
 	//Makes phi(N) from (q-1)(p-1)
 	mpz_mul(phi_n,p_minus,q_minus);
 	
@@ -192,6 +188,15 @@ int main (){
 	
 	printf("Phi N is :\n");
 	mpz_out_str(stdout,10,phi_n);
+	printf("\n");
+	
+	//Check if gcd(e,phi(n))==1)
+	while(mpz_gcd_ui(NULL,e,mpz_get_ui(phi_n))!=1){
+		mpz_add_ui(e,e,1);
+	
+	}
+	printf("E is relative prime to phi(N), e is now:");
+	mpz_out_str(stdout,10,e);
 	printf("\n");
 	
 	
@@ -234,10 +239,6 @@ int main (){
 	
 	
 	//PKCS encrypt
-	mpz_t pkcs_x;
-	mpz_init(pkcs_x);
-	
-	
 	printf("GMP print of PKCS=");
 	mpz_out_str(stdout,10,cat_large);
 	printf("\n");
@@ -249,9 +250,6 @@ int main (){
 	printf("\n");
 	
 	//PKCS decrypt
-	mpz_t pkcs_y;
-	mpz_init(pkcs_y);
-	
 	mpz_powm(pkcs_y,pkcs_x,d,N);
 	
 	printf("Decrypted PKCS Y or PKCS X is :\n");
