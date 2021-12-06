@@ -152,7 +152,14 @@ int main (){
 	mpz_init(q_minus);
 	//Loads in 'e' from encrypt.txt
 	FILE *test_file = fopen("encrypt.txt","a+");
-	mpz_inp_str(e,test_file,10);
+	size_t filesize = mpz_inp_str(e,test_file,10);
+	printf("File size is : %zu\n",filesize);
+	
+	char line[2048];
+	
+	unsigned int line_count =0;
+	
+	
 	
 	//Makes a random prime p of size k bits
 	get_random(p,k_large);
@@ -281,21 +288,33 @@ int main (){
 	printf("Now computing the first test values\n Printing out the first e value:");
 	
 	
-	mpz_set_ui(e,17);
+	
+	test_file = fopen("test1.txt","a+");
+	mpz_inp_str(e,test_file,10);
+	
+
 	mpz_out_str(stdout,10,e);
+	
+	while(fgets(line,2048,test_file)){
+		printf("line[%06d]: %s", ++line_count,line);
+		if(line_count == 2){
+			mpz_set_str(p,line,10);
+		}
+		if(line_count == 3){
+			mpz_set_str(q,line,10);
+		}
+	}
 	
 	
 	
 	
 	printf("\nPrinting out the first p value\n");
-	FILE *p_file = fopen("pTest1.txt","a+");
-	mpz_inp_str(p,p_file,10);
-	//mpz_set_str(p,340282366920938463463370103832140841039,10);
+	
 	mpz_out_str(stdout,10,p);
 	
 	printf("\nPrinting out the first q value\n");
-	FILE *q_file = fopen("qTest1.txt","a+");
-	mpz_inp_str(q,q_file,10);
+	//FILE *q_file = fopen("qTest1.txt","a+");
+	//mpz_inp_str(q,q_file,10);
 	mpz_out_str(stdout,10,q);
 	
 	printf("\nThe value of N is now:\n");
@@ -353,7 +372,7 @@ int main (){
 	
 	
 	
-	printf("Our X is:\n");
+	printf("Our next X is:\n");
 	mpz_set_ui(x,777);
 	mpz_out_str(stdout,10,x);
 	printf("\n");
@@ -361,21 +380,41 @@ int main (){
 	
 	
 	
+	test_file = fopen("test2.txt","a+");
+	mpz_inp_str(e,test_file,10);
+	
+	
+	mpz_out_str(stdout,10,e);
+	
+	while(fgets(line,2048,test_file)){
+		printf("line[%06d]: %s", ++line_count,line);
+		if(line_count == 2){
+			mpz_set_str(p,line,10);
+		}
+		if(line_count == 3){
+			mpz_set_str(q,line,10);
+		}
+	}
+	
+	
+	
+	
+	
 	printf("Now computing the first test values\n");
 	printf("Printing out the first e value:");
 	
-	mpz_set_ui(e,65537);
+	//mpz_set_ui(e,65537);
 	mpz_out_str(stdout,10,e);
 	
 	printf("\nPrinting out the first p value\n");
-	p_file = fopen("pTest2.txt","a+");
-	mpz_inp_str(p,p_file,10);
+	//p_file = fopen("pTest2.txt","a+");
+	//mpz_inp_str(p,p_file,10);
 	//mpz_set_str(p,340282366920938463463370103832140841039,10);
 	mpz_out_str(stdout,10,p);
 	
 	printf("\nPrinting out the first q value\n");
-	q_file = fopen("qTest2.txt","a+");
-	mpz_inp_str(q,q_file,10);
+	//q_file = fopen("qTest2.txt","a+");
+	//mpz_inp_str(q,q_file,10);
 	mpz_out_str(stdout,10,q);
 	
 	printf("\nThe value of N is now:\n");
