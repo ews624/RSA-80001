@@ -150,15 +150,14 @@ int main (){
 	mpz_init(pkcs_y);
 	mpz_init(p_minus);
 	mpz_init(q_minus);
+	
+	char line[4096];
+	unsigned int line_count =0;
+	
 	//Loads in 'e' from encrypt.txt
 	FILE *test_file = fopen("encrypt.txt","a+");
 	size_t filesize = mpz_inp_str(e,test_file,10);
 	printf("File size is : %zu\n",filesize);
-	
-	char line[2048];
-	
-	unsigned int line_count =0;
-	
 	
 	
 	//Makes a random prime p of size k bits
@@ -228,7 +227,6 @@ int main (){
 	
 	
 	//Encrypt x here
-	
 	encrypt(x,x,e,N);
 	
 	
@@ -260,9 +258,17 @@ int main (){
 	mpz_powm(pkcs_y,pkcs_x,d,N);
 	
 	printf("Decrypted PKCS Y or PKCS X is :\n");
-	mpz_out_str(stdout,10,pkcs_y);
-	printf("\n");
+	char *output = mpz_get_str(NULL,10,pkcs_y);
 	
+	memmove(output,output+1,strlen(output));
+	
+	char final[strlen(output)];
+	strcpy(final,output);
+	
+	memmove(final,final+1,strlen(final));
+	memmove(final,final+1,strlen(final));
+	printf("%s\n",final);
+
 	//Where do you want to save your values?
 	printf("What do you want to name the file for d and N?\n");
 	scanf("%s",file_name);
@@ -280,141 +286,38 @@ int main (){
 	file_save(file_name,y);
 	
 	
-	printf("Our X is:\n");
-	mpz_set_ui(x,7);
-	mpz_out_str(stdout,10,x);
-	printf("\n");
-	
-	printf("Now computing the first test values\n Printing out the first e value:");
-	
-	
-	
-	test_file = fopen("test1.txt","a+");
-	mpz_inp_str(e,test_file,10);
-	
-
-	mpz_out_str(stdout,10,e);
-	
-	while(fgets(line,2048,test_file)){
-		printf("line[%06d]: %s", ++line_count,line);
-		if(line_count == 2){
-			mpz_set_str(p,line,10);
-		}
-		if(line_count == 3){
-			mpz_set_str(q,line,10);
-		}
-	}
-	
-	
-	
-	
-	printf("\nPrinting out the first p value\n");
-	
-	mpz_out_str(stdout,10,p);
-	
-	printf("\nPrinting out the first q value\n");
-	//FILE *q_file = fopen("qTest1.txt","a+");
-	//mpz_inp_str(q,q_file,10);
-	mpz_out_str(stdout,10,q);
-	
-	printf("\nThe value of N is now:\n");
-	mpz_mul(N,p,q);
-	mpz_out_str(stdout,10,N);
-	
-	//Make p-1 and q-1
-	mpz_sub_ui(p_minus,p,1);
-	mpz_sub_ui(q_minus,q,1);
-	
-	printf("\nQ-1 is :\n");
-	mpz_out_str(stdout,10,q_minus);
-	printf("\n");
-	
-	printf("P-1 is :\n");
-	mpz_out_str(stdout,10,p_minus);
-	printf("\n");
-	
-	//Makes phi(N) from (q-1)(p-1)
-	mpz_mul(phi_n,p_minus,q_minus);
-	
-	printf("Phi N is :\n");
-	mpz_out_str(stdout,10,phi_n);
-	printf("\n");
-	
-	mpz_invert(d,e,phi_n);
-	
-	printf("D is :\n");
-	mpz_out_str(stdout,10,d);
-	printf("\n");
-	
-	//Test if ed = 1 mod phi(N) 
-	mpz_mul(test,e,d);
-	mpz_mod(test,test,phi_n);
-	
-	printf("ed mod phi n is :");
-	mpz_out_str(stdout,10,test);
-	printf("\n");
-	
-	//Encrypt x here
-	encrypt(x,x,e,N);
-	
-	
-	printf("Encrypted X or Y is :\n");
-	mpz_out_str(stdout,10,x);
-	printf("\n");
-	
-	//Decrypt x here
-	decrypt(y,x,d,N);
-	
-	
-	printf("Decrypted Y or X is :\n");
-	mpz_out_str(stdout,10,y);
-	printf("\n");
-	
-	
-	
-	printf("Our next X is:\n");
-	mpz_set_ui(x,777);
-	mpz_out_str(stdout,10,x);
-	printf("\n");
-	
-	
-	
-	
-	test_file = fopen("test2.txt","a+");
-	mpz_inp_str(e,test_file,10);
-	
-	
-	mpz_out_str(stdout,10,e);
-	
-	while(fgets(line,2048,test_file)){
-		printf("line[%06d]: %s", ++line_count,line);
-		if(line_count == 2){
-			mpz_set_str(p,line,10);
-		}
-		if(line_count == 3){
-			mpz_set_str(q,line,10);
-		}
-	}
-	
-	
-	
-	
-	
 	printf("Now computing the first test values\n");
-	printf("Printing out the first e value:");
 	
-	//mpz_set_ui(e,65537);
+	printf("What is the name of the file that contains x?\n");
+	scanf("%s",file_name);
+	
+	x_file = fopen(file_name,"a+");
+	mpz_inp_str(x,x_file,10);
+	
+	
+	printf("What is the name of the file that contains p,q,e?\n");
+	scanf("%s",file_name);
+	
+	
+	test_file = fopen(file_name,"a+");
+	mpz_inp_str(e,test_file,10);
 	mpz_out_str(stdout,10,e);
 	
+	while(fgets(line,2048,test_file)){
+		printf("line[%06d]: %s", ++line_count,line);
+		if(line_count == 2){
+			mpz_set_str(p,line,10);
+		}
+		if(line_count == 3){
+			mpz_set_str(q,line,10);
+		}
+	}
+	
+	
 	printf("\nPrinting out the first p value\n");
-	//p_file = fopen("pTest2.txt","a+");
-	//mpz_inp_str(p,p_file,10);
-	//mpz_set_str(p,340282366920938463463370103832140841039,10);
 	mpz_out_str(stdout,10,p);
 	
 	printf("\nPrinting out the first q value\n");
-	//q_file = fopen("qTest2.txt","a+");
-	//mpz_inp_str(q,q_file,10);
 	mpz_out_str(stdout,10,q);
 	
 	printf("\nThe value of N is now:\n");
@@ -462,14 +365,123 @@ int main (){
 	mpz_out_str(stdout,10,x);
 	printf("\n");
 	
+	printf("What do you want to name the file for d and N?\n");
+	scanf("%s",file_name);
+	file_save(file_name,N);
+	file_save(file_name,d);
+	
+	printf("What do you want to name the file for E(x)?\n");
+	scanf("%s",file_name);
+	file_save(file_name,x);
+	
+	
 	//Decrypt x here
 	decrypt(y,x,d,N);
-	
 	
 	printf("Decrypted Y or X is :\n");
 	mpz_out_str(stdout,10,y);
 	printf("\n");
 	
+	printf("What do you want to name the file for D(c)?\n");
+	scanf("%s",file_name);
+	file_save(file_name,y);
+	
+	printf("\nNext Testing values\n");
+	
+	printf("What is the name of the file that contains x?\n");
+	scanf("%s",file_name);
+	
+	x_file = fopen(file_name,"a+");
+	mpz_inp_str(x,x_file,10);
+	
+	printf("What is the name of the file that contains p,q,e?\n");
+	scanf("%s",file_name);
+	
+	test_file = fopen(file_name,"a+");
+	mpz_inp_str(e,test_file,10);
+	mpz_out_str(stdout,10,e);
+	
+	while(fgets(line,2048,test_file)){
+		printf("line[%06d]: %s", ++line_count,line);
+		if(line_count == 5){
+			mpz_set_str(p,line,10);
+		}
+		if(line_count == 6){
+			mpz_set_str(q,line,10);
+		}
+	}
+	
+	
+	printf("\nPrinting out the first p value\n");
+	mpz_out_str(stdout,10,p);
+	
+	printf("\nPrinting out the first q value\n");
+	mpz_out_str(stdout,10,q);
+	
+	printf("\nThe value of N is now:\n");
+	mpz_mul(N,p,q);
+	mpz_out_str(stdout,10,N);
+	
+	//Make p-1 and q-1
+	mpz_sub_ui(p_minus,p,1);
+	mpz_sub_ui(q_minus,q,1);
+	
+	printf("\nQ-1 is :\n");
+	mpz_out_str(stdout,10,q_minus);
+	printf("\n");
+	
+	printf("P-1 is :\n");
+	mpz_out_str(stdout,10,p_minus);
+	printf("\n");
+	
+	//Makes phi(N) from (q-1)(p-1)
+	mpz_mul(phi_n,p_minus,q_minus);
+	
+	printf("Phi N is :\n");
+	mpz_out_str(stdout,10,phi_n);
+	printf("\n");
+	
+	mpz_invert(d,e,phi_n);
+	
+	printf("D is :\n");
+	mpz_out_str(stdout,10,d);
+	printf("\n");
+	
+	//Test if ed = 1 mod phi(N) 
+	mpz_mul(test,e,d);
+	mpz_mod(test,test,phi_n);
+	
+	printf("ed mod phi n is :");
+	mpz_out_str(stdout,10,test);
+	printf("\n");
+	
+	//Encrypt x here
+	encrypt(x,x,e,N);
+	
+	
+	printf("Encrypted X or Y is :\n");
+	mpz_out_str(stdout,10,x);
+	printf("\n");
+	
+	printf("What do you want to name the file for d and N?\n");
+	scanf("%s",file_name);
+	file_save(file_name,N);
+	file_save(file_name,d);
+	
+	printf("What do you want to name the file for E(x)?\n");
+	scanf("%s",file_name);
+	file_save(file_name,x);
+	
+	//Decrypt x here
+	decrypt(y,x,d,N);
+	
+	printf("Decrypted Y or X is :\n");
+	mpz_out_str(stdout,10,y);
+	printf("\n");
+	
+	printf("What do you want to name the file for D(c)?\n");
+	scanf("%s",file_name);
+	file_save(file_name,y);
 	
 	
 	return 1;
